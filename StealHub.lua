@@ -1,69 +1,169 @@
--- StealHub Optimized Script
+-- StealHub Ultimate Script
 local player = game.Players.LocalPlayer
-local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 
--- GUI الأساسي
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "StealHub"
-screenGui.Parent = player:WaitForChild("PlayerGui")
+-- تابع لإعادة ربط GUI بعد Respawn
+local function createGUI()
+    -- حذف أي GUI قديم
+    if player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("StealHub") then
+        player.PlayerGui.StealHub:Destroy()
+    end
 
--- Frame إدخال المفتاح
-local keyFrame = Instance.new("Frame")
-keyFrame.Size = UDim2.new(0, 300, 0, 150)
-keyFrame.Position = UDim2.new(0.5, -150, 0.5, -75)
-keyFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
-keyFrame.Parent = screenGui
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "StealHub"
+    screenGui.ResetOnSpawn = false
+    screenGui.Parent = player:WaitForChild("PlayerGui")
 
--- TextBox لكتابة المفتاح
-local keyBox = Instance.new("TextBox")
-keyBox.Size = UDim2.new(0.8, 0, 0.3, 0)
-keyBox.Position = UDim2.new(0.1, 0, 0.2, 0)
-keyBox.PlaceholderText = "اكتب المفتاح هنا"
-keyBox.Text = ""
-keyBox.TextScaled = true
-keyBox.Parent = keyFrame
+    -- Frame إدخال المفتاح
+    local keyFrame = Instance.new("Frame")
+    keyFrame.Size = UDim2.new(0, 300, 0, 150)
+    keyFrame.Position = UDim2.new(0.5, -150, 0.5, -75)
+    keyFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    keyFrame.Parent = screenGui
 
--- زر التأكيد
-local confirmBtn = Instance.new("TextButton")
-confirmBtn.Size = UDim2.new(0.5, 0, 0.25, 0)
-confirmBtn.Position = UDim2.new(0.25, 0, 0.6, 0)
-confirmBtn.Text = "تأكيد المفتاح"
-confirmBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-confirmBtn.TextScaled = true
-confirmBtn.Parent = keyFrame
+    local keyBox = Instance.new("TextBox")
+    keyBox.Size = UDim2.new(0.8,0,0.3,0)
+    keyBox.Position = UDim2.new(0.1,0,0.2,0)
+    keyBox.PlaceholderText = "اكتب المفتاح هنا"
+    keyBox.Text = ""
+    keyBox.TextScaled = true
+    keyBox.Parent = keyFrame
 
--- GUI الرئيسي
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 250, 0, 250)
-mainFrame.Position = UDim2.new(0.05, 0, 0.3, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(40,40,40)
-mainFrame.Visible = false
-mainFrame.Parent = screenGui
+    local confirmBtn = Instance.new("TextButton")
+    confirmBtn.Size = UDim2.new(0.5,0,0.25,0)
+    confirmBtn.Position = UDim2.new(0.25,0,0.6,0)
+    confirmBtn.Text = "تأكيد المفتاح"
+    confirmBtn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+    confirmBtn.TextScaled = true
+    confirmBtn.Parent = keyFrame
 
--- صندوق لكتابة السرعة
-local speedBox = Instance.new("TextBox")
-speedBox.Size = UDim2.new(0.8, 0, 0.2, 0)
-speedBox.Position = UDim2.new(0.1, 0, 0.05, 0)
-speedBox.Text = "80"
-speedBox.TextScaled = true
-speedBox.Parent = mainFrame
+    -- GUI الرئيسي
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0,250,0,250)
+    mainFrame.Position = UDim2.new(0.05,0,0.3,0)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    mainFrame.Visible = false
+    mainFrame.Parent = screenGui
 
--- زر السرعة تشغيل/إيقاف
-local speedBtn = Instance.new("TextButton")
-speedBtn.Size = UDim2.new(0.8, 0, 0.18, 0)
-speedBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
-speedBtn.Text = "تفعيل السرعة"
-speedBtn.BackgroundColor3 = Color3.fromRGB(0,200,0)
-speedBtn.TextScaled = true
-speedBtn.Parent = mainFrame
+    local speedBox = Instance.new("TextBox")
+    speedBox.Size = UDim2.new(0.8,0,0.2,0)
+    speedBox.Position = UDim2.new(0.1,0,0.05,0)
+    speedBox.Text = "80"
+    speedBox.TextScaled = true
+    speedBox.Parent = mainFrame
 
--- زر الرفع
-local flyBtn = Instance.new("TextButton")
-flyBtn.Size = UDim2.new(0.8, 0, 0.18, 0)
-flyBtn.Position = UDim2.new(0.1, 0, 0.52, 0)
-flyBtn.Text = "الرفع عالياً"
-flyBtn.BackgroundColor3 = Color3.fromRGB(200,0,0)
+    local speedBtn = Instance.new("TextButton")
+    speedBtn.Size = UDim2.new(0.8,0,0.18,0)
+    speedBtn.Position = UDim2.new(0.1,0,0.3,0)
+    speedBtn.Text = "تفعيل السرعة"
+    speedBtn.BackgroundColor3 = Color3.fromRGB(0,200,0)
+    speedBtn.TextScaled = true
+    speedBtn.Parent = mainFrame
+
+    local flyBtn = Instance.new("TextButton")
+    flyBtn.Size = UDim2.new(0.8,0,0.18,0)
+    flyBtn.Position = UDim2.new(0.1,0,0.52,0)
+    flyBtn.Text = "الرفع عالياً"
+    flyBtn.BackgroundColor3 = Color3.fromRGB(200,0,0)
+    flyBtn.TextScaled = true
+    flyBtn.Parent = mainFrame
+
+    local downBtn = Instance.new("TextButton")
+    downBtn.Size = UDim2.new(0.8,0,0.18,0)
+    downBtn.Position = UDim2.new(0.1,0,0.74,0)
+    downBtn.Text = "النزول"
+    downBtn.BackgroundColor3 = Color3.fromRGB(0,0,200)
+    downBtn.TextScaled = true
+    downBtn.Parent = mainFrame
+
+    local correctKey = "stealhub"
+
+    local oldY = nil
+    local speedActive = false
+    local originalSpeed = 16
+    local hasLifted = false
+
+    local function getHook()
+        local backpack = player:WaitForChild("Backpack")
+        local hook = backpack:FindFirstChild("Grapple Hook") or (player.Character and player.Character:FindFirstChild("Grapple Hook"))
+        if hook and player.Character then
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:EquipTool(hook)
+            end
+        end
+    end
+
+    confirmBtn.MouseButton1Click:Connect(function()
+        if string.lower(keyBox.Text) == string.lower(correctKey) then
+            keyFrame.Visible = false
+            mainFrame.Visible = true
+        end
+    end)
+
+    speedBtn.MouseButton1Click:Connect(function()
+        getHook()
+        local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            if not speedActive then
+                speedActive = true
+                originalSpeed = humanoid.WalkSpeed
+                humanoid.WalkSpeed = tonumber(speedBox.Text) or 80
+                speedBtn.Text = "إيقاف السرعة"
+            else
+                speedActive = false
+                humanoid.WalkSpeed = originalSpeed
+                speedBtn.Text = "تفعيل السرعة"
+            end
+        end
+    end)
+
+    flyBtn.MouseButton1Click:Connect(function()
+        if hasLifted then return end
+        hasLifted = true
+        getHook()
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local root = player.Character.HumanoidRootPart
+            oldY = root.Position.Y
+            local targetY = oldY + 20 -- رفع ثابت وآمن
+            -- رفع سلس
+            for i=1,20 do
+                root.CFrame = CFrame.new(root.Position.X, oldY + i, root.Position.Z)
+                task.wait(0.01)
+            end
+        end
+    end)
+
+    downBtn.MouseButton1Click:Connect(function()
+        getHook()
+        if oldY and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local root = player.Character.HumanoidRootPart
+            local pos = root.Position
+            root.CFrame = CFrame.new(pos.X, oldY, pos.Z)
+            hasLifted = false
+        end
+    end)
+
+    -- Grapple Hook دائمًا
+    player.CharacterAdded:Connect(function(char)
+        char.ChildRemoved:Connect(function(child)
+            if child.Name == "Grapple Hook" then
+                task.wait(0.2)
+                getHook()
+            end
+        end)
+    end)
+end
+
+-- إنشاء GUI عند البداية
+createGUI()
+
+-- إعادة إنشاء GUI بعد Respawn
+player.CharacterAdded:Connect(function()
+    task.wait(1)
+    createGUI()
+end)flyBtn.BackgroundColor3 = Color3.fromRGB(200,0,0)
 flyBtn.TextScaled = true
 flyBtn.Parent = mainFrame
 
