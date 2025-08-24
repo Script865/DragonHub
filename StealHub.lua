@@ -1,5 +1,7 @@
--- StealHub Full Script مع زر النزول (حفظ ارتفاع فقط)
+-- StealHub Optimized Script
 local player = game.Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 -- GUI الأساسي
 local screenGui = Instance.new("ScreenGui")
@@ -47,7 +49,7 @@ speedBox.Text = "80"
 speedBox.TextScaled = true
 speedBox.Parent = mainFrame
 
--- زر السرعة
+-- زر السرعة تشغيل/إيقاف
 local speedBtn = Instance.new("TextButton")
 speedBtn.Size = UDim2.new(0.8, 0, 0.18, 0)
 speedBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
@@ -77,15 +79,20 @@ downBtn.Parent = mainFrame
 -- المفتاح الصحيح
 local correctKey = "stealhub"
 
--- حفظ الارتفاع الأصلي
+-- المتغيرات
 local oldY = nil
+local speedActive = false
+local originalSpeed = 16 -- default Roblox WalkSpeed
 
--- التأكد من Grapple Hook
+-- تأكد من Grapple Hook
 local function getHook()
 	local backpack = player:WaitForChild("Backpack")
 	local hook = backpack:FindFirstChild("Grapple Hook") or (player.Character and player.Character:FindFirstChild("Grapple Hook"))
-	if hook then
-		player.Character.Humanoid:EquipTool(hook)
+	if hook and player.Character then
+		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid:EquipTool(hook)
+		end
 	end
 end
 
@@ -102,31 +109,51 @@ speedBtn.MouseButton1Click:Connect(function()
 	getHook()
 	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
 	if humanoid then
-		local newSpeed = tonumber(speedBox.Text) or 80
-		humanoid.WalkSpeed = newSpeed
+		if not speedActive then
+			speedActive = true
+			originalSpeed = humanoid.WalkSpeed
+			humanoid.WalkSpeed = tonumber(speedBox.Text) or 80
+			speedBtn.Text = "إيقاف السرعة"
+		else
+			speedActive = false
+			humanoid.WalkSpeed = originalSpeed
+			speedBtn.Text = "تفعيل السرعة"
+		end
 	end
 end)
 
--- زر الرفع
+-- رفع آمن بدون قتل اللاعب
 flyBtn.MouseButton1Click:Connect(function()
 	getHook()
 	if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-		oldY = player.Character.HumanoidRootPart.Position.Y -- حفظ الارتفاع
-		player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame + Vector3.new(0,150,0)
+		oldY = player.Character.HumanoidRootPart.Position.Y
+		local root = player.Character.HumanoidRootPart
+		-- رفع باستخدام BodyVelocity لتجنب مشاكل الفيزيكس
+		local bv = Instance.new("BodyVelocity")
+		bv.MaxForce = Vector3.new(0, math.huge, 0)
+		bv.Velocity = Vector3.new(0,150,0)
+		bv.Parent = root
+		task.wait(0.3)
+		bv:Destroy()
 	end
 end)
 
--- زر النزول (ينزل بنفس المكان الحالي لكن على الارتفاع القديم)
+-- النزول على نفس الموقع ولكن ارتفاع سابق
 downBtn.MouseButton1Click:Connect(function()
+	getHook()
 	if oldY and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-		getHook()
 		local root = player.Character.HumanoidRootPart
 		local pos = root.Position
-		root.CFrame = CFrame.new(pos.X, oldY, pos.Z) * root.CFrame.Rotation
+		local bv = Instance.new("BodyVelocity")
+		bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+		bv.Velocity = Vector3.new(0, oldY - pos.Y, 0)
+		bv.Parent = root
+		task.wait(0.3)
+		bv:Destroy()
 	end
 end)
 
--- إذا حاول يشيل Grapple Hook يرجعه
+-- Grapple Hook دائمًا موجود
 player.CharacterAdded:Connect(function(char)
 	char.ChildRemoved:Connect(function(child)
 		if child.Name == "Grapple Hook" then
