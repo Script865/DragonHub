@@ -1,4 +1,4 @@
--- StealHub Full Script مؤلاي
+-- StealHub Full Script مؤلاي (محسّن GodMode + تعديل السرعة)
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
@@ -30,7 +30,7 @@ confirm.Text = "تأكيد المفتاح"
 
 -- == الواجهة الرئيسية ==
 local mainGui = Instance.new("Frame", screenGui)
-mainGui.Size = UDim2.new(0,250,0,450)
+mainGui.Size = UDim2.new(0,250,0,500)
 mainGui.Position = UDim2.new(0.05,0,0.3,0)
 mainGui.BackgroundColor3 = Color3.fromRGB(40,40,40)
 mainGui.Visible = false
@@ -46,11 +46,19 @@ local function createButton(text,pos)
 end
 
 local speedBtn = createButton("تفعيل السرعة",UDim2.new(0.1,0,0.05,0))
-local highJumpBtn = createButton("النطة العالية",UDim2.new(0.1,0,0.15,0))
+local jumpBtn = createButton("النطة العالية",UDim2.new(0.1,0,0.15,0))
 local godBtn = createButton("عدم الموت",UDim2.new(0.1,0,0.25,0))
 local noclipBtn = createButton("اختراق الجدران",UDim2.new(0.1,0,0.35,0))
 local infiniteJumpBtn = createButton("نطات لا نهائية",UDim2.new(0.1,0,0.45,0))
 local autoHookBtn = createButton("امسك الأداة تلقائي",UDim2.new(0.1,0,0.55,0))
+
+-- صندوق تعديل السرعة
+local speedBox = Instance.new("TextBox", mainGui)
+speedBox.Size = UDim2.new(0.8,0,0.08,0)
+speedBox.Position = UDim2.new(0.1,0,0.62,0)
+speedBox.PlaceholderText = "اكتب السرعة هنا"
+speedBox.Text = "80"
+speedBox.TextScaled = true
 
 -- المفتاح
 local KEY = "stealhub"
@@ -66,7 +74,7 @@ local speedOn = false
 speedBtn.MouseButton1Click:Connect(function()
 	speedOn = not speedOn
 	if speedOn then
-		hum.WalkSpeed = 80
+		hum.WalkSpeed = tonumber(speedBox.Text) or 80
 		speedBtn.Text = "إيقاف السرعة"
 	else
 		hum.WalkSpeed = 16
@@ -75,21 +83,22 @@ speedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- النطة العالية
-highJumpBtn.MouseButton1Click:Connect(function()
+jumpBtn.MouseButton1Click:Connect(function()
 	hum.JumpPower = 300
 	hum:ChangeState(Enum.HumanoidStateType.Jumping)
 end)
 
--- GodMode
+-- GodMode Toggle محسن
 local godOn = false
 godBtn.MouseButton1Click:Connect(function()
 	godOn = not godOn
 	godBtn.Text = godOn and "عدم الموت ✅" or "عدم الموت ❌"
 end)
 
-hum.HealthChanged:Connect(function(h)
-	if godOn and h < hum.MaxHealth then
+RunService.Heartbeat:Connect(function()
+	if godOn and hum.Health < hum.MaxHealth then
 		hum.Health = hum.MaxHealth
+		hum.PlatformStand = false
 	end
 end)
 
