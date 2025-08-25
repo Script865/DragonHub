@@ -1,10 +1,11 @@
--- StealHub Script Full Control
-
+-- StealHub Full Script مؤلاي
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local hum = char:WaitForChild("Humanoid")
-local uis = game:GetService("UserInputService")
+local root = char:WaitForChild("HumanoidRootPart")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 -- GUI Setup
 local playerGui = player:WaitForChild("PlayerGui")
@@ -15,52 +16,43 @@ screenGui.ResetOnSpawn = false
 local keyFrame = Instance.new("Frame", screenGui)
 keyFrame.Size = UDim2.new(0, 250, 0, 150)
 keyFrame.Position = UDim2.new(0.5, -125, 0.5, -75)
-keyFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+keyFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
 
 local textBox = Instance.new("TextBox", keyFrame)
-textBox.Size = UDim2.new(1, -20, 0, 40)
-textBox.Position = UDim2.new(0, 10, 0, 20)
+textBox.Size = UDim2.new(1,-20,0,40)
+textBox.Position = UDim2.new(0,10,0,20)
 textBox.PlaceholderText = "اكتب المفتاح هنا"
-textBox.Text = ""
 
 local confirm = Instance.new("TextButton", keyFrame)
-confirm.Size = UDim2.new(1, -20, 0, 30)
-confirm.Position = UDim2.new(0, 10, 0, 70)
+confirm.Size = UDim2.new(1,-20,0,30)
+confirm.Position = UDim2.new(0,10,0,70)
 confirm.Text = "تأكيد المفتاح"
 
 -- == الواجهة الرئيسية ==
-local mainGui = Instance.new("Frame")
-mainGui.Size = UDim2.new(0, 250, 0, 300)
-mainGui.Position = UDim2.new(0.05, 0, 0.3, 0)
-mainGui.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+local mainGui = Instance.new("Frame", screenGui)
+mainGui.Size = UDim2.new(0,250,0,450)
+mainGui.Position = UDim2.new(0.05,0,0.3,0)
+mainGui.BackgroundColor3 = Color3.fromRGB(40,40,40)
 mainGui.Visible = false
-mainGui.Parent = screenGui
 
--- زر السرعة
-local speedBtn = Instance.new("TextButton", mainGui)
-speedBtn.Size = UDim2.new(0.8, 0, 0.15, 0)
-speedBtn.Position = UDim2.new(0.1, 0, 0.05, 0)
-speedBtn.Text = "تفعيل السرعة"
+-- أزرار التحكم
+local function createButton(text,pos)
+	local btn = Instance.new("TextButton", mainGui)
+	btn.Size = UDim2.new(0.8,0,0.08,0)
+	btn.Position = pos
+	btn.Text = text
+	btn.TextScaled = true
+	return btn
+end
 
--- زر النطة العالية
-local jumpBtn = Instance.new("TextButton", mainGui)
-jumpBtn.Size = UDim2.new(0.8, 0, 0.15, 0)
-jumpBtn.Position = UDim2.new(0.1, 0, 0.25, 0)
-jumpBtn.Text = "نطة عالية"
+local speedBtn = createButton("تفعيل السرعة",UDim2.new(0.1,0,0.05,0))
+local highJumpBtn = createButton("النطة العالية",UDim2.new(0.1,0,0.15,0))
+local godBtn = createButton("عدم الموت",UDim2.new(0.1,0,0.25,0))
+local noclipBtn = createButton("اختراق الجدران",UDim2.new(0.1,0,0.35,0))
+local infiniteJumpBtn = createButton("نطات لا نهائية",UDim2.new(0.1,0,0.45,0))
+local autoHookBtn = createButton("امسك الأداة تلقائي",UDim2.new(0.1,0,0.55,0))
 
--- زر GodMode
-local godBtn = Instance.new("TextButton", mainGui)
-godBtn.Size = UDim2.new(0.8, 0, 0.15, 0)
-godBtn.Position = UDim2.new(0.1, 0, 0.45, 0)
-godBtn.Text = "عدم الموت"
-
--- زر مسك الأداة تلقائي
-local autoEquipBtn = Instance.new("TextButton", mainGui)
-autoEquipBtn.Size = UDim2.new(0.8, 0, 0.15, 0)
-autoEquipBtn.Position = UDim2.new(0.1, 0, 0.65, 0)
-autoEquipBtn.Text = "امسك الأداة تلقائي"
-
--- زر مفتاح الدخول
+-- المفتاح
 local KEY = "stealhub"
 confirm.MouseButton1Click:Connect(function()
 	if string.lower(textBox.Text) == KEY then
@@ -83,33 +75,69 @@ speedBtn.MouseButton1Click:Connect(function()
 end)
 
 -- النطة العالية
-jumpBtn.MouseButton1Click:Connect(function()
+highJumpBtn.MouseButton1Click:Connect(function()
 	hum.JumpPower = 300
 	hum:ChangeState(Enum.HumanoidStateType.Jumping)
 end)
 
--- GodMode Toggle
-local godModeOn = false
+-- GodMode
+local godOn = false
 godBtn.MouseButton1Click:Connect(function()
-	godModeOn = not godModeOn
-	godBtn.Text = godModeOn and "عدم الموت ✅" or "عدم الموت ❌"
+	godOn = not godOn
+	godBtn.Text = godOn and "عدم الموت ✅" or "عدم الموت ❌"
 end)
 
 hum.HealthChanged:Connect(function(h)
-	if godModeOn and h < hum.MaxHealth then
+	if godOn and h < hum.MaxHealth then
 		hum.Health = hum.MaxHealth
 	end
 end)
 
--- مسك الأداة تلقائي Toggle
-local autoEquipOn = false
-autoEquipBtn.MouseButton1Click:Connect(function()
-	autoEquipOn = not autoEquipOn
-	autoEquipBtn.Text = autoEquipOn and "امسك الأداة ✅" or "امسك الأداة ❌"
+-- Noclip
+local noclipOn = false
+noclipBtn.MouseButton1Click:Connect(function()
+	noclipOn = not noclipOn
+	noclipBtn.Text = noclipOn and "اختراق الجدران ✅" or "اختراق الجدران ❌"
+end)
+
+RunService.Stepped:Connect(function()
+	if noclipOn and char then
+		for _, part in pairs(char:GetChildren()) do
+			if part:IsA("BasePart") then
+				part.CanCollide = false
+			end
+		end
+	else
+		for _, part in pairs(char:GetChildren()) do
+			if part:IsA("BasePart") then
+				part.CanCollide = true
+			end
+		end
+	end
+end)
+
+-- نطات لا نهائية
+local infiniteJumpOn = false
+infiniteJumpBtn.MouseButton1Click:Connect(function()
+	infiniteJumpOn = not infiniteJumpOn
+	infiniteJumpBtn.Text = infiniteJumpOn and "نطات لا نهائية ✅" or "نطات لا نهائية ❌"
+end)
+
+UIS.JumpRequest:Connect(function()
+	if infiniteJumpOn then
+		hum:ChangeState(Enum.HumanoidStateType.Jumping)
+	end
+end)
+
+-- Grapple Hook تلقائي
+local autoHookOn = false
+autoHookBtn.MouseButton1Click:Connect(function()
+	autoHookOn = not autoHookOn
+	autoHookBtn.Text = autoHookOn and "امسك الأداة ✅" or "امسك الأداة ❌"
 end)
 
 local function equipHook()
-	if autoEquipOn and char then
+	if autoHookOn and char then
 		local tool = char:FindFirstChild("Grapple Hook") or player.Backpack:FindFirstChild("Grapple Hook")
 		if tool and tool.Parent ~= char then
 			hum:EquipTool(tool)
@@ -122,7 +150,7 @@ player.CharacterAdded:Connect(function(c)
 	hum = char:WaitForChild("Humanoid")
 end)
 
--- تحقق مستمر
+-- تحقق مستمر كل ثانية
 while task.wait(1) do
 	equipHook()
 end
@@ -147,7 +175,7 @@ local function makeDraggable(gui)
 			dragInput = input
 		end
 	end)
-	uis.InputChanged:Connect(function(input)
+	UIS.InputChanged:Connect(function(input)
 		if input == dragInput and dragging then
 			local delta = input.Position - dragStart
 			gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
