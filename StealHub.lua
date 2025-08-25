@@ -1,4 +1,4 @@
--- StealHub Full Script مؤلاي (محسّن GodMode + تعديل السرعة)
+-- StealHub Full Script مؤلاي (GodMode محمي + GUI قابل للتحريك)
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
@@ -45,17 +45,17 @@ local function createButton(text,pos)
 	return btn
 end
 
-local speedBtn = createButton("تفعيل السرعة",UDim2.new(0.1,0,0.05,0))
-local jumpBtn = createButton("النطة العالية",UDim2.new(0.1,0,0.15,0))
-local godBtn = createButton("عدم الموت",UDim2.new(0.1,0,0.25,0))
-local noclipBtn = createButton("اختراق الجدران",UDim2.new(0.1,0,0.35,0))
-local infiniteJumpBtn = createButton("نطات لا نهائية",UDim2.new(0.1,0,0.45,0))
-local autoHookBtn = createButton("امسك الأداة تلقائي",UDim2.new(0.1,0,0.55,0))
+local speedBtn = createButton("تفعيل السرعة",UDim2.new(0.1,0,0.2,0))
+local jumpBtn = createButton("النطة العالية",UDim2.new(0.1,0,0.3,0))
+local godBtn = createButton("عدم الموت",UDim2.new(0.1,0,0.4,0))
+local noclipBtn = createButton("اختراق الجدران",UDim2.new(0.1,0,0.5,0))
+local infiniteJumpBtn = createButton("نطات لا نهائية",UDim2.new(0.1,0,0.6,0))
+local autoHookBtn = createButton("امسك الأداة تلقائي",UDim2.new(0.1,0,0.7,0))
 
--- صندوق تعديل السرعة
+-- صندوق تعديل السرعة فوق زر السرعة
 local speedBox = Instance.new("TextBox", mainGui)
 speedBox.Size = UDim2.new(0.8,0,0.08,0)
-speedBox.Position = UDim2.new(0.1,0,0.62,0)
+speedBox.Position = UDim2.new(0.1,0,0.1,0)
 speedBox.PlaceholderText = "اكتب السرعة هنا"
 speedBox.Text = "80"
 speedBox.TextScaled = true
@@ -88,7 +88,7 @@ jumpBtn.MouseButton1Click:Connect(function()
 	hum:ChangeState(Enum.HumanoidStateType.Jumping)
 end)
 
--- GodMode Toggle محسن
+-- GodMode محمي جدًا
 local godOn = false
 godBtn.MouseButton1Click:Connect(function()
 	godOn = not godOn
@@ -99,6 +99,7 @@ RunService.Heartbeat:Connect(function()
 	if godOn and hum.Health < hum.MaxHealth then
 		hum.Health = hum.MaxHealth
 		hum.PlatformStand = false
+		hum.Sit = false
 	end
 end)
 
